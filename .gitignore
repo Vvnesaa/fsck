@@ -1,1 +1,4 @@
 disk
+*.o
+myfsck
+*.tar

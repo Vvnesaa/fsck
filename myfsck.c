@@ -8,6 +8,7 @@
 
 #include "myfsck.h"
 #include "printPartitionTable.h"
+#include "ext2fsutil.h"
 
 int theParNum = 0; // Partition Number
 char* diskFileName = 0; // Disk Image File Name
@@ -55,5 +56,7 @@ int main(int argc, char *argv[]) {
 	//printf("%d %s\n", pNum, diskFileName);
 	
 	printPartitionInfo();
+	//ext2fsutilTest(par[1].start, par[1].length);
+	
 	return 0;
 }
