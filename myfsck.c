@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
 	//printf("%d %s\n", pNum, diskFileName);
 	
 	printPartitionInfo();
-	//ext2fsutilTest(par[1].start, par[1].length);
+	ext2fsutilTest(par[1].start, par[1].length);
 	
 	return 0;
 }

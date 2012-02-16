@@ -67,6 +67,17 @@ int isInodeBitmapSet(int inodeNo, unsigned char *inodeBitmap, int groupNum, int 
 	return (inodeBitmap[groupNo * blockSize + index] & (1 << bit)) >> bit;
 }
 
+/* ret 1 if in block bitmap blockno is 1, else ret 0 */
+int isBlockBitmapSet(int blockNo, unsigned char *blockBitmap, int groupNum, int blockSize, struct ext2_super_block *superBlock) {
+	int groupNo;
+	int groupBlockNo;
+	getGroupBlock(blockNo, &groupNo, &groupBlockNo, superBlock);
+	int index;
+	int bit;
+	getIndexBit(groupBlockNo, &index, &bit);
+	return (blockBitmap[groupNo * blockSize + index] & (1 << bit)) >> bit;
+}
+
 void ext2fsutilTest(int start, int length) {
 	struct ext2_super_block x;
 	getSuperBlock(start, &x);
@@ -76,13 +87,15 @@ void ext2fsutilTest(int start, int length) {
 	getGroupDescs(start, groupDescs, groupNum);
 	unsigned char *blockBitmap = malloc(blockSize * groupNum + 1);
 	getBlockBitmap(start, groupDescs, groupNum, blockBitmap, blockSize);
-	free(blockBitmap);
 	unsigned char *inodeBitmap = malloc(blockSize * groupNum + 1);
 	getInodeBitmap(start, groupDescs, groupNum, inodeBitmap, blockSize);
 	
 	struct ext2_inode *inodeTable = malloc(sizeof(struct ext2_inode) * x.s_inodes_per_group * groupNum);
 	getInodeTable(start, &x, groupDescs, groupNum, inodeTable, blockSize);
 	//printf("%d\n", inodeTable[1].i_mode);
-	free(inodeTable);
+	
 	//printf("%d\n", isInodeBitmapSet(2, inodeBitmap, groupNum, blockSize, &x));
+	printf("%d\n", isBlockBitmapSet(5000, blockBitmap, groupNum, blockSize, &x));
+	free(blockBitmap);
+	free(inodeBitmap);
 }
