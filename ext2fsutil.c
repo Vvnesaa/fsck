@@ -1,5 +1,4 @@
 #include "ext2fsutil.h"
-#include <math.h>
 
 void getSuperBlock(int parStart, struct ext2_super_block *buf) {
 	readDisk(parStart * SECTOR_SIZE + SUPER_BLOCK_OFFSET, SUPER_BLOCK_SIZE , buf);
@@ -59,6 +58,7 @@ inline void getIndexBit(int Number, int *index, int *bit) {
 }
 
 /* ret 1 if in inode bitmap inodeNo is 1, else ret 0 */
+/* local inode number */
 int isInodeBitmapSet(int inodeNo, unsigned char *inodeBitmap, int groupNum, int blockSize, struct ext2_super_block *superBlock) {
 	int groupNo;
 	int groupInodeNo;
@@ -70,6 +70,7 @@ int isInodeBitmapSet(int inodeNo, unsigned char *inodeBitmap, int groupNum, int 
 }
 
 /* ret 1 if in block bitmap blockno is 1, else ret 0 */
+/* local block Number */
 int isBlockBitmapSet(int blockNo, unsigned char *blockBitmap, int groupNum, int blockSize, struct ext2_super_block *superBlock) {
 	int groupNo;
 	int groupBlockNo;
@@ -82,6 +83,10 @@ int isBlockBitmapSet(int blockNo, unsigned char *blockBitmap, int groupNum, int 
 
 inline int isDirectory(struct ext2_inode *inode) {
 	return inode->i_mode & EXT2_S_IFDIR ? 1 : 0;
+}
+
+inline int isSymbolicLink(struct ext2_inode *inode) {
+	return inode->i_mode & EXT2_S_IFLNK ? 1 : 0;
 }
 
 inline int localNo(int x) {
@@ -171,7 +176,58 @@ void ext2fsutilTest(int start, int length) {
 	unsigned char *buf = malloc(inodeTable[localNo(EXT2_ROOT_INO)].i_size);
 	getData(start, inodeTable + 1, blockSize, buf);
 	AnalyzeDir(inodeTable + 1, buf);
+	
+/*	struct ext2_inode *inode;
+	//we already know /lion is on inode 4017
+	inode = inodeTable + 4016;
+	printf("%d\n", isDirectory(inode));
+	unsigned char *lionbuf = malloc(inode->i_size);
+	getData(start, inode, blockSize, lionbuf);
+	AnalyzeDir(inode, lionbuf);
 
+	//we already know /lion/tigers is on inode 4018
+	inode = inodeTable + 4017;
+	printf("%d\n", isDirectory(inode));
+	unsigned char *tigersbuf= malloc(inode->i_size);
+	getData(start, inode, blockSize, tigersbuf);
+	AnalyzeDir(inode, tigersbuf);
+
+	//we already know /lion/tigers/bears is on inode 4019
+	inode = inodeTable + 4018;
+	printf("%d\n", isDirectory(inode));
+	unsigned char *bearsbuf= malloc(inode->i_size);
+	getData(start, inode, blockSize, bearsbuf);
+	AnalyzeDir(inode, bearsbuf);
+	
+	//we already know /lion/tigers/bears/ohmy.txt is on inode 4021
+	inode = inodeTable + 4020;
+	printf("%d\n", isDirectory(inode)); 
+	unsigned char *txtbuf= malloc(inode->i_size);
+	getData(start, inode, blockSize, txtbuf);
+	//printf("%s", txtbuf);
+	printf("%d\n", isBlockBitmapSet(localNo(inode->i_block[0]), blockBitmap, groupNum, blockSize, &x));
+
+	free(txtbuf); 
+	free(bearsbuf);	
+	free(tigersbuf);
+	free(lionbuf); */
+
+/*	struct ext2_inode *inode;
+	//we already know /oz/tornado/glinda is on inode 30 
+	inode = inodeTable + 29;
+	printf("%d\n", isSymbolicLink(inode));
+	printf("%d %d %d %d\n", inode->i_size, inode->i_blocks, inode->i_block[0], inode->i_block[1]);
+	int i;
+	for (i = 0; i < inode->i_size; ++i)
+		printf("%c", ((unsigned char *)inode->i_block)[i]);
+	printf("\n");
+//	unsigned char *ozbuf = malloc(inode->i_size);
+//	getData(start, inode, blockSize, ozbuf);
+//	printf("%s\n", ozbuf);
+//	AnalyzeDir(inode, ozbuf);
+	
+//	free(ozbuf);
+*/
 	free(buf);
 	free(blockBitmap);
 	free(inodeBitmap);

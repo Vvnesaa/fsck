@@ -15,7 +15,13 @@
 #define ONE_GROUP_DESC_SIZE sizeof(struct ext2_group_desc)
 #define MAX_GROUP_NUM 100 // Maximum Group Number ???
 #define INODE_SIZE sizeof(struct ext2_inode)
+#define EXT2_s_IFSOCK 0xC000
+#define EXT2_S_IFLNK 0xA000
+#define EXT2_S_IFREG 0x8000
+#define EXT2_S_IFBLK 0x6000
 #define EXT2_S_IFDIR 0x4000
+#define EXT2_S_IFCHR 0x2000
+#define EXT2_S_IFIFO 0x1000
 #define DIR_SIZE sizeof(struct ext2_dir_entry_2)
 
 void getSuperBlock(int parStart, struct ext2_super_block *buf);
@@ -29,9 +35,12 @@ void getInodeGroupBlock(int inodeNo, int *groupNo, int *groupInodeNo, struct ext
 void getInodeTable(int parStart, struct ext2_super_block *superBlock, struct ext2_group_desc groupDescs[], int groupNum, struct ext2_inode *inodeTable, int blockSize);
 int localNo(int x);
 int isDirectory(struct ext2_inode *inode);
+int isSymbolicLink(struct ext2_inode *inode);
 int isBlockBitmapSet(int blockNo, unsigned char *blockBitmap, int groupNum, int blockSize, struct ext2_super_block *superBlock);
 int isInodeBitmapSet(int inodeNo, unsigned char *inodeBitmap, int groupNum, int blockSize, struct ext2_super_block *superBlock);
 void getIndexBit(int Number, int *index, int *bit);
 int roundUp(int a, int b);
+void getData(int parStart, struct ext2_inode *inode, int blockSize, unsigned char* buf);
+void AnalyzeDir(struct ext2_inode *inode, unsigned char *buf);
 
 #endif
