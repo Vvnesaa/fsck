@@ -20,12 +20,24 @@ void readDisk(unsigned int startPoint, unsigned int readByteNum, void *buf) {
 
 	if ((lret = lseek64(device, startPoint, SEEK_SET)) != startPoint) {
 		printf("Seek to position %d failed at %lld, device:%d\n", startPoint, lret, device);
-		perror("");
 		exit(-1);
 	}
 	if ((ret = read(device, buf, readByteNum)) != readByteNum) {
 		printf("Read disk error at %d length %d\n", startPoint, readByteNum);
 		exit(-1);
+	}
+}
+
+void writeDisk(unsigned int startPoint, unsigned int writeByteNum, void *buf) {
+	int ret;
+        int64_t lret;
+	if ((lret = lseek64(device, startPoint, SEEK_SET)) != startPoint) {
+		printf("Seek to position %d failed at %lld, device:%d\n", startPoint, lret, device);
+                exit(-1);
+	}
+	if ((ret = write(device, buf, writeByteNum)) != writeByteNum) {
+		printf("Write disk error at %d length %d\n", startPoint, writeByteNum);
+                exit(-1);
 	}
 }
 
@@ -35,10 +47,13 @@ int getIntFromBuf(unsigned char* buf, int start) {
 }
 
 int main(int argc, char *argv[]) {
+	int fsck = 0;
 	int opt;
 	opterr = 0;
-	while ((opt = getopt(argc, argv, "p:i:")) != -1) {
+	while ((opt = getopt(argc, argv, "f:p:i:")) != -1) {
 		switch (opt) {
+			case 'f':
+				fsck = 1;
 			case 'p':
 				theParNum = atoi(optarg);
 				break;
@@ -53,10 +68,20 @@ int main(int argc, char *argv[]) {
 		printf("Argument error\n");
 		return 0;
 	}
-	//printf("%d %s\n", pNum, diskFileName);
+//	printf("%d %d %s\n", fsck, pNum, diskFileName);
 	
-	printPartitionInfo();
-	ext2fsutilTest(par[1].start, par[1].length);
+	printPartitionInfo(fsck);
+	if (fsck) {
+		int i;
+		printf("%d\n", pNum);
+		for (i = 1; i <= pNum; ++i)
+			if (par[i].type == EXT2_TYPE && (theParNum == 0 || theParNum == i)) {
+			init(par[i].start);
+			pass1(i, par[i].start);
+			cleanup();
+		}
+	}
+//	ext2fsutilTest(par[1].start, par[1].length);
 	
 	return 0;
 }

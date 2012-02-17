@@ -12,6 +12,7 @@
 #define PAR_START_OFFSET 8 // Partition Start Sector Number Offset in One Partition Record
 #define PAR_LEN_OFFSET 12 // Partition Total Sector Number Offset in One Partition Record
 #define EXTEND_TYPE 5 // Partition Type Number for Extended Partition
+#define EXT2_TYPE 0x83
 
 struct Partition {
 	unsigned char type;
@@ -21,6 +22,6 @@ struct Partition {
 extern struct Partition par[MAX_PARTITION_NUMBER]; // Records of all Partitions
 extern int pNum; // Max Partition Number
 
-void printPartitionInfo();
+void printPartitionInfo(int fsckFlag);
 
 #endif

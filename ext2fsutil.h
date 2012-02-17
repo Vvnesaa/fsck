@@ -23,6 +23,7 @@
 #define EXT2_S_IFCHR 0x2000
 #define EXT2_S_IFIFO 0x1000
 #define DIR_SIZE sizeof(struct ext2_dir_entry_2)
+#define GROUP_SIZE sizeof(struct ext2_group_desc)
 
 void getSuperBlock(int parStart, struct ext2_super_block *buf);
 void ext2fsutilTest(int start, int length);

@@ -1,7 +1,7 @@
 P = 1
 D = disk
 CC=gcc
-OBJ = myfsck.o printPartitionTable.o ext2fsutil.o
+OBJ = myfsck.o printPartitionTable.o ext2fsutil.o init.o pass1.o
 CFLAGS = -Wall -g -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -c
 
 myfsck: $(OBJ)
@@ -12,8 +12,15 @@ printPartitionTable.o: printPartitionTable.c printPartitionTable.h
 	$(CC) $(CFLAGS) printPartitionTable.c
 ext2fsutil.o: ext2fsutil.c ext2fsutil.h
 	$(CC) $(CFLAGS) ext2fsutil.c
+init.o: init.c init.h
+	$(CC) $(CFLAGS) init.c
+pass1.o: pass1.c pass1.h
+	$(CC) $(CFLAGS) pass1.c
 
-run: myfsck
+runf: myfsck
+	./myfsck -f $(P) -i $(D)
+
+runp: myfsck
 	./myfsck -p $(P) -i $(D)
 
 tar:

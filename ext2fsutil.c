@@ -4,7 +4,7 @@ void getSuperBlock(int parStart, struct ext2_super_block *buf) {
 	readDisk(parStart * SECTOR_SIZE + SUPER_BLOCK_OFFSET, SUPER_BLOCK_SIZE , buf);
 }
 
-void getGroupDescs(int parStart, struct ext2_group_desc buf[MAX_GROUP_NUM], int groupNum) {
+void getGroupDescs(int parStart, struct ext2_group_desc *buf, int groupNum) {
 	readDisk(parStart * SECTOR_SIZE + GROUP_DESC_OFFSET, ONE_GROUP_DESC_SIZE * groupNum, buf);
 }
 
