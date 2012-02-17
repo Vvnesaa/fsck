@@ -2,7 +2,7 @@ P = 1
 D = disk
 CC=gcc
 OBJ = myfsck.o printPartitionTable.o ext2fsutil.o
-CFLAGS = -Wall -g -D_LARGEFILE64_SOURCE -c
+CFLAGS = -Wall -g -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -c
 
 myfsck: $(OBJ)
 	$(CC) -lm -o myfsck $(OBJ)
