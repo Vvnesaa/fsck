@@ -73,11 +73,12 @@ int main(int argc, char *argv[]) {
 	printPartitionInfo(fsck);
 	if (fsck) {
 		int i;
-		printf("%d\n", pNum);
+//		printf("%d\n", pNum);
 		for (i = 1; i <= pNum; ++i)
 			if (par[i].type == EXT2_TYPE && (theParNum == 0 || theParNum == i)) {
-			init(par[i].start);
-			pass1(i, par[i].start);
+			init(i, par[i].start);
+			pass1();
+			pass2();
 			cleanup();
 		}
 	}

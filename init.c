@@ -7,8 +7,14 @@ struct ext2_group_desc *groupDescs;
 unsigned char *blockBitmap;
 unsigned char *inodeBitmap;
 struct ext2_inode *inodeTable;
+int *inodeLink;
+int partitionNumber;
+int start;
 
-void init(int start) {
+void init(int pN, int parStart) {
+	partitionNumber = pN;
+	start = parStart;
+
 	getSuperBlock(start, &x);
 	groupNum = getGroupNumber(&x);
 	blockSize = EXT2_BLOCK_SIZE(&x);
@@ -20,6 +26,10 @@ void init(int start) {
 	getInodeBitmap(start, groupDescs, groupNum, inodeBitmap, blockSize);
 	inodeTable = malloc(INODE_SIZE * groupNum * EXT2_INODES_PER_GROUP(&x));
 	getInodeTable(start, &x, groupDescs, groupNum, inodeTable, blockSize);
+	inodeLink = malloc(sizeof(int) * groupNum * EXT2_INODES_PER_GROUP(&x));
+	int i;
+	for (i = 0; i < groupNum * EXT2_INODES_PER_GROUP(&x); ++i)
+		inodeLink[i] = 0;
 }
 
 void cleanup() {
@@ -27,4 +37,5 @@ void cleanup() {
 	free(blockBitmap);
 	free(inodeBitmap);
 	free(inodeTable);
+	free(inodeLink);
 }

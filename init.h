@@ -8,6 +8,9 @@ extern struct ext2_group_desc *groupDescs;
 extern unsigned char *blockBitmap;
 extern unsigned char *inodeBitmap;
 extern struct ext2_inode *inodeTable;
+extern int *inodeLink;
+extern int partitionNumber;
+extern int start;
 
-void init(int start);
+void init(int pN, int parStart);
 void cleanup();

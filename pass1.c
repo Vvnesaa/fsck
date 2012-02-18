@@ -1,9 +1,5 @@
 #include "pass1.h"
 
-int partitionNumber;
-int start;
-int *checkedInode;
-
 void checkDir(struct ext2_inode *inode, unsigned char *buf, int localId, int parent) {
 	int changeDir = 0;
 	int n = 0;
@@ -15,7 +11,7 @@ void checkDir(struct ext2_inode *inode, unsigned char *buf, int localId, int par
 		dir = (struct ext2_dir_entry_2 *)(buf + tempSize);
 		++n;
 		if (n == 1) { // .
-			if (dir->name_len == 1 && strcmp(strndup(dir->name, dir->name_len), ".") == 0) {
+			if (dir->name_len == 1 && strcmp(strndupa(dir->name, dir->name_len), ".") == 0) {
 				if (dir->inode != localId + 1) {
 					printf("Error: Partition %d Dir Inode %d: . has wrong dir->inode %d, change to itself\n", partitionNumber, localId + 1, dir->inode);
 					dir->inode = localId + 1;
@@ -29,9 +25,9 @@ void checkDir(struct ext2_inode *inode, unsigned char *buf, int localId, int par
 				changeDir = 1;
 			}
 		} else if (n == 2) { // ..
-			if (dir->name_len == 2 && strcmp(strndup(dir->name, dir->name_len), "..") == 0) {
+			if (dir->name_len == 2 && strcmp(strndupa(dir->name, dir->name_len), "..") == 0) {
 				if (dir->inode != parent) {
-					printf("Error: Partition %d Dir Inode %d: .. has wrong dir->inode %d, change to itself\n", partitionNumber, localId + 1, dir->inode);
+					printf("Error: Partition %d Dir Inode %d: .. has wrong dir->inode %d, change to its parent\n", partitionNumber, localId + 1, dir->inode);
 					dir->inode = parent;
 					changeDir = 1;
 				}
@@ -55,29 +51,18 @@ void checkDir(struct ext2_inode *inode, unsigned char *buf, int localId, int par
 
 // localId has local No., parent has global No.
 void checkDirInode(int localId, int parent) {
-	if (checkedInode[localId]) return;
-	checkedInode[localId] = 1;
+	++inodeLink[localId];
+	if (inodeLink[localId] > 1) return;
 	struct ext2_inode *inode;
 	inode = inodeTable + localId;
 	if (!isDirectory(inode)) return;
 	unsigned char *buf = malloc(inode->i_size);
 	getData(start, inode, blockSize, buf);
-	printf("check inode %d\n", localId + 1);
 	checkDir(inode, buf, localId, parent);
-	printf("finish check inode %d\n", localId + 1);
 
 	free(buf);
 }
 
-void pass1(int pN, int parStart) {
-	partitionNumber = pN;
-	start = parStart;
-	printf("start Pass 1\n");
-	checkedInode = malloc(sizeof(int) * groupNum * EXT2_INODES_PER_GROUP(&x));
-	int i;
-	for (i = 0; i < groupNum * EXT2_INODES_PER_GROUP(&x); ++i)
-		checkedInode[i] = 0;
+void pass1() {
 	checkDirInode(localNo(EXT2_ROOT_INO), EXT2_ROOT_INO);
-	free(checkedInode);
-	printf("end Pass 1\n");
 }

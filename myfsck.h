@@ -3,6 +3,7 @@
 
 #include "init.h"
 #include "pass1.h"
+#include "pass2.h"
 #define SECTOR_SIZE 512 // Sector Size in Bytes
 
 extern int theParNum; // Partition Number

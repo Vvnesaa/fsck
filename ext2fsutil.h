@@ -37,6 +37,7 @@ void getInodeTable(int parStart, struct ext2_super_block *superBlock, struct ext
 int localNo(int x);
 int isDirectory(struct ext2_inode *inode);
 int isSymbolicLink(struct ext2_inode *inode);
+inline int isRegFile(struct ext2_inode *inode);
 int isBlockBitmapSet(int blockNo, unsigned char *blockBitmap, int groupNum, int blockSize, struct ext2_super_block *superBlock);
 int isInodeBitmapSet(int inodeNo, unsigned char *inodeBitmap, int groupNum, int blockSize, struct ext2_super_block *superBlock);
 void getIndexBit(int Number, int *index, int *bit);

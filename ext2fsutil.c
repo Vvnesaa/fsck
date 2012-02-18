@@ -89,6 +89,10 @@ inline int isSymbolicLink(struct ext2_inode *inode) {
 	return inode->i_mode & EXT2_S_IFLNK ? 1 : 0;
 }
 
+inline int isRegFile(struct ext2_inode *inode) {
+	return inode->i_mode & EXT2_S_IFREG ? 1 : 0;
+}
+
 inline int localNo(int x) {
 	return x - 1;
 }
