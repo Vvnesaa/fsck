@@ -24,6 +24,7 @@ void checkDir(struct ext2_inode *inode, unsigned char *buf, int localId, int par
 				dir->inode = localId + 1;
 				changeDir = 1;
 			}
+			checkDirInode(localNo(dir->inode), localId + 1);
 		} else if (n == 2) { // ..
 			if (dir->name_len == 2 && strcmp(strndupa(dir->name, dir->name_len), "..") == 0) {
 				if (dir->inode != parent) {
@@ -39,6 +40,7 @@ void checkDir(struct ext2_inode *inode, unsigned char *buf, int localId, int par
 				dir->inode = localId + 1;
 				changeDir = 1;
 			}
+			checkDirInode(localNo(dir->inode), localId + 1);
 		} else {
 			if (dir->inode != 0)
 				checkDirInode(localNo(dir->inode), localId + 1);
@@ -65,4 +67,5 @@ void checkDirInode(int localId, int parent) {
 
 void pass1() {
 	checkDirInode(localNo(EXT2_ROOT_INO), EXT2_ROOT_INO);
+	inodeLink[localNo(EXT2_ROOT_INO)]--;
 }
