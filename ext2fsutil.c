@@ -69,6 +69,19 @@ int isInodeBitmapSet(int inodeNo, unsigned char *inodeBitmap, int groupNum, int 
 	return (inodeBitmap[groupNo * blockSize + index] & (1 << bit)) >> bit;
 }
 
+void setInodeBitmapSet(int inodeNo, unsigned char *inodeBitmap, int groupNum, int blockSize, struct ext2_super_block *superBlock, int setbit) {
+	int groupNo;
+	int groupInodeNo;
+	getInodeGroupBlock(inodeNo, &groupNo, &groupInodeNo, superBlock);
+	int index;
+	int bit;
+	getIndexBit(groupInodeNo, &index, &bit);
+	if (setbit)
+		inodeBitmap[groupNo * blockSize + index] |= (1 << bit);
+	else
+		inodeBitmap[groupNo * blockSize + index] &= (~(1 << bit));
+}
+
 /* ret 1 if in block bitmap blockno is 1, else ret 0 */
 /* local block Number */
 int isBlockBitmapSet(int blockNo, unsigned char *blockBitmap, int groupNum, int blockSize, struct ext2_super_block *superBlock) {

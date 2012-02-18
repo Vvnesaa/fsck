@@ -10,6 +10,7 @@
 #include "printPartitionTable.h"
 #include "ext2fsutil.h"
 #include "pass3.h"
+#include "pass4.h"
 
 int theParNum = 0; // Partition Number
 char* diskFileName = 0; // Disk Image File Name
@@ -81,6 +82,7 @@ int main(int argc, char *argv[]) {
 			pass1();
 			pass2();
 			pass3();
+			pass4();
 			cleanup();
 		}
 	}
