@@ -41,6 +41,7 @@ inline int isRegFile(struct ext2_inode *inode);
 int isBlockBitmapSet(int blockNo, unsigned char *blockBitmap, int groupNum, int blockSize, struct ext2_super_block *superBlock);
 int isInodeBitmapSet(int inodeNo, unsigned char *inodeBitmap, int groupNum, int blockSize, struct ext2_super_block *superBlock);
 void setInodeBitmapSet(int inodeNo, unsigned char *inodeBitmap, int groupNum, int blockSize, struct ext2_super_block *superBlock, int setbit);
+void setBlockBitmapSet(int blockNo, unsigned char *blockBitmap, int groupNum, int blockSize, struct ext2_super_block *superBlock, int setbit);
 void getIndexBit(int Number, int *index, int *bit);
 int roundUp(int a, int b);
 void getData(int parStart, struct ext2_inode *inode, int blockSize, unsigned char* buf);

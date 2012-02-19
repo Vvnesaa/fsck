@@ -89,6 +89,39 @@ void addToLost(struct ext2_inode *lost, int ID) {
 	free(fileName);
 }
 
+void updateParent(struct ext2_inode *inode, int parent) {
+	if (!isDirectory(inode)) return;
+	unsigned char *buf = malloc(inode->i_size);
+	getData(start, inode, blockSize, buf);
+	int tempSize = 0;
+	int n = 0;
+	int totalSize = inode->i_size;
+	struct ext2_dir_entry_2 *dir;
+	while (tempSize < totalSize) {
+		++n;
+		dir = (struct ext2_dir_entry_2 *)(buf + tempSize);
+		if (n == 2) { //..
+			printf("change inode's parent to lost+found\n");
+			dir->inode = parent;
+		} else if (n > 2 && dir->inode != 0 && isDirectory(inodeTable + localNo(dir->inode))) {
+			dir->inode = 0;
+		}
+		tempSize += dir->rec_len;
+	}
+	tempSize = 0;
+	int i;
+	int currentTemp;
+	for (i = 0; i < 12; ++i) {
+		if (totalSize - tempSize < blockSize)
+			currentTemp = totalSize - tempSize;
+		else
+			currentTemp = blockSize;
+		writeDisk(start * SECTOR_SIZE + inode->i_block[i] * blockSize, currentTemp, buf + tempSize);
+		tempSize += blockSize;
+		if (tempSize >= totalSize) break;
+	}
+}
+
 void pass2() {
 	// Found /lost+found
 	int lostInodeId = findDirInode(localNo(EXT2_ROOT_INO), "lost+found");
@@ -104,6 +137,7 @@ void pass2() {
 		if (inode->i_links_count > 0 && inodeLink[i] == 0) {
 			printf("partition %d inode %d should be put into lost+found\n", partitionNumber, i + 1);
 			addToLost(inodeTable + localNo(lostInodeId), i + 1);
+			updateParent(inode, lostInodeId);
 		}
 	}
 	for (i = 0; i < groupNum * EXT2_INODES_PER_GROUP(&x); ++i)

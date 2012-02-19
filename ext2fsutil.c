@@ -82,6 +82,20 @@ void setInodeBitmapSet(int inodeNo, unsigned char *inodeBitmap, int groupNum, in
 		inodeBitmap[groupNo * blockSize + index] &= (~(1 << bit));
 }
 
+void setBlockBitmapSet(int blockNo, unsigned char *blockBitmap, int groupNum, int blockSize, struct ext2_super_block *superBlock, int setbit) {
+	//printf("%d\n", blockNo);
+	int groupNo;
+	int groupBlockNo;
+	getGroupBlock(blockNo, &groupNo, &groupBlockNo, superBlock);
+	int index;
+	int bit;
+	getIndexBit(groupBlockNo, &index, &bit);
+	if (setbit) 
+		blockBitmap[groupNo * blockSize + index] |= (1 << bit);
+	else
+		blockBitmap[groupNo * blockSize + index] &= (~(1 << bit));
+}
+
 /* ret 1 if in block bitmap blockno is 1, else ret 0 */
 /* local block Number */
 int isBlockBitmapSet(int blockNo, unsigned char *blockBitmap, int groupNum, int blockSize, struct ext2_super_block *superBlock) {
@@ -95,15 +109,18 @@ int isBlockBitmapSet(int blockNo, unsigned char *blockBitmap, int groupNum, int 
 }
 
 inline int isDirectory(struct ext2_inode *inode) {
-	return inode->i_mode & EXT2_S_IFDIR ? 1 : 0;
+	int temp = inode->i_mode & 0xF000;
+	return temp == EXT2_S_IFDIR;
 }
 
 inline int isSymbolicLink(struct ext2_inode *inode) {
-	return inode->i_mode & EXT2_S_IFLNK ? 1 : 0;
+	int temp = inode->i_mode & 0xF000;
+	return temp == EXT2_S_IFLNK;
 }
 
 inline int isRegFile(struct ext2_inode *inode) {
-	return inode->i_mode & EXT2_S_IFREG ? 1 : 0;
+	int temp = inode->i_mode & 0xF000;
+	return temp == EXT2_S_IFREG;
 }
 
 inline int localNo(int x) {
